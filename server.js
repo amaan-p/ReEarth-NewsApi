@@ -25,6 +25,8 @@ app.get('/news', (req, res) => {
     .get('http://google.com/search', AXIOS_OPTIONS)
     .then(({ data }) => {
       const $ = cheerio.load(data);
+      const pattern = /s='(?<img>[^']+)';\w+\s\w+=\['(?<id>\w+_\d+)'];/gm;
+      const images = [...data.matchAll(pattern)].map(({ groups }) => ({ id: groups.id, img: groups.img.replace('\\x3d', '') }))
 
       const allNewsInfo = Array.from($('.WlydOe')).map((el) => {
         return {
@@ -32,8 +34,7 @@ app.get('/news', (req, res) => {
           source: $(el).find('.CEMjEf span').text().trim(),
           title: $(el).find('.nDgy9d').text().trim().replace('\n', ''),
           snippet: $(el).find('.GI74Re').text().trim().replace('\n', ''),
-          imgURL: $(el).find('#div_img img').text().trim().replace('\n', ''),
-          date: $(el).find('span').text().trim(),
+          image: images.find(({ id, img }) => id === $(el).find('.uhHOwf img').attr('id'))?.img || "No image",          date: $(el).find('span').text().trim(),
         };
       });
 
