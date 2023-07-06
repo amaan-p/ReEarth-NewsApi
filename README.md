@@ -1,0 +1,2 @@
+# ReEarth-NewsApi
+For Announcements
